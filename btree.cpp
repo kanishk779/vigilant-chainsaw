@@ -35,6 +35,7 @@ void IO(){
 struct Node
 {
 	int keys[3];
+	int freq[3];
 	Node * children[4];
 	int is_leaf = true;
 };
@@ -44,9 +45,20 @@ void insert(Node * node, int val){
 	return;
 }
 int find_val(Node * node, int val){
-	return 0;
+	assert(node != NULL);
+	if (node->is_leaf == true){
+		if(node->keys[0] == val || node->keys[1] == val)
+			return 1;
+		return 0;
+	}
+	if(val < node->keys[0])
+		return find_val(node->children[0], val);
+	else if(val >= node->keys[0] && val < node->keys[1])
+		return find_val(node->children[1], val);
+	else
+		return find_val(node->children[2], val);
 }
-int count_val(Node * node, int val){
+Node * count_val(Node * node, int val){
 	return 0;
 }
 int range(Node * node, int x, int y){
