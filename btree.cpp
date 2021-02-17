@@ -35,13 +35,13 @@ void IO(){
 struct Node
 {
 	int keys[3];
-	int freq[3];
-	Node * children[4];
+	int freq[3]; // matters only at leaf nodes
+	Node * children[4]; // child pointers
 	int is_leaf = true;
-	Node * next_node;
-	int subtree_size[4];
-	int curr_size;
-	Node * parent;
+	Node * next_node; // next node, matters only at leaf node.
+	int subtree_size[4]; // stores number of keys associated with each of the child pointers
+	int curr_size; // how many keys are present in a node.
+	Node * parent; // parent of this Node, NULL for root
 	int which_child;
 };
 // REMEMBER TO DELETE UNUSED NODES
@@ -53,7 +53,7 @@ struct ToBeInserted
 };
 // 1. get a ToBeInserted Node.
 // 2. Insert at correct place by shifting others.
-// 3. If the size is greater than again split and create a ToBeInserted Node.
+// 3. If the size of the b+tree node is greater than again split and create a ToBeInserted Node.
 // 4. Repeat above 3 steps recursively
 Node * root = NULL;
 
@@ -72,6 +72,36 @@ Node * give_node(){
 	return root;
 }
 void insert_internal(Node * node, ToBeInserted * ins){
+	if(node->curr_size == 1){
+		if(ins->val < node->keys[0]){
+			node->children[2] = node->children[1];
+			node->children[1] = ins->right;
+			node->children[0] = ins->left;
+		}
+		else{
+			node->children[1] = ins->left;
+			node->children[2] = ins->right;
+		}
+	}
+	else{
+		if(ins->val < node->keys[0]){
+			for(int i=3;i>=2;i--){
+				node->children[i] = node->children[i-1];
+			}
+			node->children[0] = ins->left;
+			node->children[1] = ins->right;
+		}
+		else if(ins->val > node->keys[0] && ins->val < node->keys[1]){
+			node->children[3] = node->children[2];
+			node->children[2] = ins->right;
+			node->children[1] = ins->left;
+		}
+		else{
+			node->children[3] = ins->right;
+			node->children[2] = ins->left;
+		}
+		
+	}
 	return;
 }
 void insert(Node * node, int val){
