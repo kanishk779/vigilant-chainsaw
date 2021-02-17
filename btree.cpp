@@ -40,10 +40,63 @@ struct Node
 	int is_leaf = true;
 	Node * next_node;
 	int subtree_size[4];
+	int curr_size;
+	Node * parent;
 };
 Node * root = NULL;
 
+Node * give_node(){
+	Node * root = new Node;
+	root->curr_size = 1;
+	root->is_leaf = true;
+	root->next_node = NULL;
+	rep(i,0,3){
+		root->subtree_size[i] = 0;
+		root->children[i] = NULL;
+		root->freq[i] = 0;
+	}
+	root->parent = NULL;
+	return root;
+}
 void insert(Node * node, int val){
+	if(root == NULL){
+		root = give_node();
+		root->keys[0] = val;
+		root->freq[0] = 1;
+		return;
+	}
+	while(node->is_leaf == false){
+		if(val < node->keys[0])
+			node = node->children[0];
+		else{
+			if(node->curr_size == 1)
+				node = node->children[1];
+			else{
+				if(val >= node->keys[0] && val < node->keys[1])
+					node = node->children[1];
+				else
+					node = node->children[2];
+			}
+		}
+	}
+	if(node->curr_size == 1){
+		if(val == node->keys[0]){
+			node->freq[0]++;
+		}
+		else{
+			if(val > node->keys[0]){
+				node->keys[1] = val;
+				node->freq[1] = 1;
+			}
+			else{
+				swap(node->keys[0], node->keys[1]);
+				swap(node->freq[0], node->freq[1]);
+				node->keys[0] = val;
+				node->freq[0] = 1;
+			}
+		}
+	}
+	
 	return;
 }
 II find_val(Node * node, int val){
