@@ -38,18 +38,23 @@ struct Node
 	int freq[3];
 	Node * children[4];
 	int is_leaf = true;
+	Node * next_node;
+	int subtree_size[4];
 };
 Node * root = NULL;
 
 void insert(Node * node, int val){
 	return;
 }
-int find_val(Node * node, int val){
+II find_val(Node * node, int val){
 	assert(node != NULL);
 	if (node->is_leaf == true){
-		if(node->keys[0] == val || node->keys[1] == val)
-			return 1;
-		return 0;
+		if(node->keys[0] == val)
+			return MP(1, node->freq[0]);
+		else if(node->keys[1] == val)
+			return MP(1, node->freq[1]);
+		else
+			return MP(0, -1);
 	}
 	if(val < node->keys[0])
 		return find_val(node->children[0], val);
@@ -58,8 +63,49 @@ int find_val(Node * node, int val){
 	else
 		return find_val(node->children[2], val);
 }
-Node * count_val(Node * node, int val){
-	return 0;
+int count_val(int val){
+	II present = find_val(root, val);
+	if(present.F){
+		return present.S;
+	}
+	else
+		return 0;
+}
+// smallest number greater than or equal to val
+int find_geq(Node * node, int val){
+	assert(root == NULL);
+	if(node->is_leaf == true){
+		if(node->keys[0] >= val)
+			return node->keys[0];
+		else if(node->keys[1] >= val)
+			return node->keys[1];
+		else
+			return -1;
+	}
+	if(val < node->keys[0])
+		return find_geq(node->children[0], val);
+	else if(val >= node->keys[0] && val < node->keys[1])
+		return find_geq(node->children[1], val);
+	else
+		return find_geq(node->children[2], val);
+}
+// largest number smaller or equal than val
+int find_leq(Node * node, int val){
+	assert(root == NULL);
+	if(node->is_leaf == true){
+		if(node->keys[1] > val)
+			return -1;
+		if(node->keys[1] <= val)
+			return node->keys[1];
+		else if(node->keys[0] <= val)
+			return node->keys[0];
+	}
+	if(node->keys[1] <= val)
+		return find_leq(node->children[2], val);
+	else if(node->keys[0] <= val)
+		return find_leq(node->children[1], val);
+	else
+		return find_leq(node->children[0], val);
 }
 int range(Node * node, int x, int y){
 	return 0;
