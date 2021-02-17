@@ -42,7 +42,6 @@ struct Node
 	int subtree_size[4]; // stores number of keys associated with each of the child pointers
 	int curr_size; // how many keys are present in a node.
 	Node * parent; // parent of this Node, NULL for root
-	int which_child;
 };
 // REMEMBER TO DELETE UNUSED NODES
 struct ToBeInserted
@@ -108,7 +107,9 @@ void insert_internal(Node * node, ToBeInserted * ins){
 		node->curr_size++;
 	}
 	else{
+		// find the position where this node to be inserted will actually be inserted
 		if(ins->val < node->keys[0]){
+			// insert at the start at index -> 0
 			for(int i=3;i>=2;i--){
 				node->children[i] = node->children[i-1];
 				node->subtree_size[i] = node->subtree_size[i-1];
@@ -119,6 +120,7 @@ void insert_internal(Node * node, ToBeInserted * ins){
 			node->subtree_size[1] = give_size(ins->right);
 		}
 		else if(ins->val > node->keys[0] && ins->val < node->keys[1]){
+			// insert at index -> 1
 			node->children[3] = node->children[2];
 			node->subtree_size[3] = node->subtree_size[2];
 			node->children[2] = ins->right;
@@ -127,12 +129,13 @@ void insert_internal(Node * node, ToBeInserted * ins){
 			node->subtree_size[1] = give_size(ins->left);
 		}
 		else{
+			// insert at index -> 2
 			node->children[3] = ins->right;
 			node->subtree_size[3] = give_size(ins->right);
 			node->children[2] = ins->left;
 			node->subtree_size[2] = give_size(ins->left);
 		}
-		// create two new nodes
+		// create two new nodes (leftc and rightc)
 		Node * leftc = give_node();
 		Node * rightc = give_node();
 		leftc->children[0] = node->children[0];
@@ -147,11 +150,16 @@ void insert_internal(Node * node, ToBeInserted * ins){
 		rightc->subtree_size[1] = node->subtree_size[3];
 		rightc->keys[0] = node->keys[2];
 
+		if(node->is_leaf){
+			leftc->next_node = rightc; // for the leaf nodes there should be pointer to the next b+tree node
+		}
+		// prepare next "ToBeInserted" node for recursive call
 		ToBeInserted * next_ins = new ToBeInserted;
-		next_ins->val = node->keys[1];
+		next_ins->val = node->keys[1]; // the second key in this node will be promoted upwards towards the parent
 		next_ins->left = leftc;
 		next_ins->right = rightc;
 		insert_internal(node->parent, next_ins);
+		// delete this node because this is not needed
 		delete node;
 	}
 	return;
@@ -296,6 +304,6 @@ LL min_key = 1e9;
 LL max_key = -1e9;
 int main(){
 	IO();
-	
+	// while()
 	return 0;
 }
