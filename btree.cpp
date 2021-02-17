@@ -107,10 +107,19 @@ int find_leq(Node * node, int val){
 	else
 		return find_leq(node->children[0], val);
 }
-int range(Node * node, int x, int y){
-	return 0;
+// [l, r] is covered by current node
+int range(Node * node, int x, int y, int l, int r){
+	if(x > r || y < l || l > r || node == NULL)
+		return 0;
+	if(x <= l && r <= y)
+		return node->subtree_size[0] + node->subtree_size[1] + node->subtree_size[2];
+	LL ans = range(node->children[0], x, y, l, min(r, node->keys[0]-1));
+	ans += range(node->children[1], x, y, max(l, node->keys[0]), min(r, node->keys[1]-1));
+	ans += range(node->children[2], x, y, max(l, node->keys[1]), r);
+	return ans;
 } 
-
+LL min_key = 1e9;
+LL max_key = -1e9;
 int main(){
 	IO();
 	
