@@ -42,7 +42,19 @@ struct Node
 	int subtree_size[4];
 	int curr_size;
 	Node * parent;
+	int which_child;
 };
+// REMEMBER TO DELETE UNUSED NODES
+struct ToBeInserted
+{
+	int val;
+	Node * left;
+	Node * right;
+};
+// 1. get a ToBeInserted Node.
+// 2. Insert at correct place by shifting others.
+// 3. If the size is greater than again split and create a ToBeInserted Node.
+// 4. Repeat above 3 steps recursively
 Node * root = NULL;
 
 Node * give_node(){
@@ -56,7 +68,11 @@ Node * give_node(){
 		root->freq[i] = 0;
 	}
 	root->parent = NULL;
+	root->which_child = -1;
 	return root;
+}
+void insert_internal(Node * node, ToBeInserted * ins){
+	return;
 }
 void insert(Node * node, int val){
 	if(root == NULL){
@@ -96,7 +112,21 @@ void insert(Node * node, int val){
 			}
 		}
 	}
-	
+	else{
+		if(val == node->keys[0]){
+			node->freq[0]++;
+		}
+		else if(val == node->keys[1]){
+			node->freq[1]++;
+		}
+		else{
+			// split and call
+			ToBeInserted * ins = new ToBeInserted;
+			ins->val = val;
+			ins->left = ins->right = NULL;
+			insert_internal(node, ins);
+		}
+	}
 	return;
 }
 II find_val(Node * node, int val){
