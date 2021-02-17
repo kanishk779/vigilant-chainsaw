@@ -60,7 +60,7 @@ Node * root = NULL;
 Node * give_node(){
 	Node * root = new Node;
 	root->curr_size = 1;
-	root->is_leaf = true;
+	root->is_leaf = false;
 	root->next_node = NULL;
 	rep(i,0,3){
 		root->subtree_size[i] = 0;
@@ -68,8 +68,16 @@ Node * give_node(){
 		root->freq[i] = 0;
 	}
 	root->parent = NULL;
-	root->which_child = -1;
 	return root;
+}
+int give_size(Node * node){
+	if(node == NULL)
+		return 0;
+	if(node->curr_size == 1){
+		return node->subtree_size[0] + node->subtree_size[1];
+	}
+	else
+		return node->subtree_size[0] + node->subtree_size[1] + node->subtree_size[2];
 }
 void insert_internal(Node * node, ToBeInserted * ins){
 	if(node == NULL){
@@ -78,45 +86,65 @@ void insert_internal(Node * node, ToBeInserted * ins){
 		root->keys[0] = ins->val;
 		root->children[0] = ins->left;
 		root->children[1] = ins->right;
+		root->subtree_size[0] = give_size(ins->left);
+		root->subtree_size[1] = give_size(ins->right);
 		return;
 	}
 	if(node->curr_size == 1){
 		if(ins->val < node->keys[0]){
 			node->children[2] = node->children[1];
+			node->subtree_size[2] = node->subtree_size[1];
 			node->children[1] = ins->right;
+			node->subtree_size[1] = give_size(ins->right);
 			node->children[0] = ins->left;
+			node->subtree_size[0] = give_size(ins->left);
 		}
 		else{
 			node->children[1] = ins->left;
+			node->subtree_size[1] = give_size(ins->left);
 			node->children[2] = ins->right;
+			node->subtree_size[2] = give_size(ins->right);
 		}
+		node->curr_size++;
 	}
 	else{
 		if(ins->val < node->keys[0]){
 			for(int i=3;i>=2;i--){
 				node->children[i] = node->children[i-1];
+				node->subtree_size[i] = node->subtree_size[i-1];
 			}
 			node->children[0] = ins->left;
+			node->subtree_size[0] = give_size(ins->left);
 			node->children[1] = ins->right;
+			node->subtree_size[1] = give_size(ins->right);
 		}
 		else if(ins->val > node->keys[0] && ins->val < node->keys[1]){
 			node->children[3] = node->children[2];
+			node->subtree_size[3] = node->subtree_size[2];
 			node->children[2] = ins->right;
+			node->subtree_size[2] = give_size(ins->right);
 			node->children[1] = ins->left;
+			node->subtree_size[1] = give_size(ins->left);
 		}
 		else{
 			node->children[3] = ins->right;
+			node->subtree_size[3] = give_size(ins->right);
 			node->children[2] = ins->left;
+			node->subtree_size[2] = give_size(ins->left);
 		}
 		// create two new nodes
 		Node * leftc = give_node();
 		Node * rightc = give_node();
 		leftc->children[0] = node->children[0];
+		leftc->subtree_size[0] = node->subtree_size[0];
 		leftc->children[1] = node->children[1];
+		leftc->subtree_size[1] = node->subtree_size[1];
 		leftc->keys[0] = node->keys[0];
 
 		rightc->children[0] = node->children[2];
+		rightc->subtree_size[0] = node->subtree_size[2];
 		rightc->children[1] = node->children[3];
+		rightc->subtree_size[1] = node->subtree_size[3];
 		rightc->keys[0] = node->keys[2];
 
 		ToBeInserted * next_ins = new ToBeInserted;
@@ -133,6 +161,7 @@ void insert(Node * node, int val){
 		root = give_node();
 		root->keys[0] = val;
 		root->freq[0] = 1;
+		root->is_leaf = true;
 		return;
 	}
 	while(node->is_leaf == false){
