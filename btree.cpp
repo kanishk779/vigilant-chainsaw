@@ -72,6 +72,14 @@ Node * give_node(){
 	return root;
 }
 void insert_internal(Node * node, ToBeInserted * ins){
+	if(node == NULL){
+		// create a new root node
+		root = give_node();
+		root->keys[0] = ins->val;
+		root->children[0] = ins->left;
+		root->children[1] = ins->right;
+		return;
+	}
 	if(node->curr_size == 1){
 		if(ins->val < node->keys[0]){
 			node->children[2] = node->children[1];
@@ -100,7 +108,23 @@ void insert_internal(Node * node, ToBeInserted * ins){
 			node->children[3] = ins->right;
 			node->children[2] = ins->left;
 		}
-		
+		// create two new nodes
+		Node * leftc = give_node();
+		Node * rightc = give_node();
+		leftc->children[0] = node->children[0];
+		leftc->children[1] = node->children[1];
+		leftc->keys[0] = node->keys[0];
+
+		rightc->children[0] = node->children[2];
+		rightc->children[1] = node->children[3];
+		rightc->keys[0] = node->keys[2];
+
+		ToBeInserted * next_ins = new ToBeInserted;
+		next_ins->val = node->keys[1];
+		next_ins->left = leftc;
+		next_ins->right = rightc;
+		insert_internal(node->parent, next_ins);
+		delete node;
 	}
 	return;
 }
