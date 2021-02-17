@@ -222,12 +222,20 @@ II find_val(Node * node, int val){
 		else
 			return MP(0, -1);
 	}
-	if(val < node->keys[0])
-		return find_val(node->children[0], val);
-	else if(val >= node->keys[0] && val < node->keys[1])
-		return find_val(node->children[1], val);
-	else
-		return find_val(node->children[2], val);
+	if(node->curr_size == 1){
+		if(val < node->keys[0])
+			return find_val(node->children[0], val);
+		else
+			return find_val(node->children[1], val);
+	}
+	else{
+		if(val < node->keys[0])
+			return find_val(node->children[0], val);
+		else if(val >= node->keys[0] && val < node->keys[1])
+			return find_val(node->children[1], val);
+		else
+			return find_val(node->children[2], val);
+	}
 }
 int count_val(int val){
 	II present = find_val(root, val);
@@ -278,7 +286,7 @@ int range(Node * node, int x, int y, int l, int r){
 	if(x > r || y < l || l > r || node == NULL)
 		return 0;
 	if(x <= l && r <= y)
-		return node->subtree_size[0] + node->subtree_size[1] + node->subtree_size[2];
+		return give_size(node);
 	LL ans = range(node->children[0], x, y, l, min(r, node->keys[0]-1));
 	ans += range(node->children[1], x, y, max(l, node->keys[0]), min(r, node->keys[1]-1));
 	ans += range(node->children[2], x, y, max(l, node->keys[1]), r);
