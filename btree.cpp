@@ -76,6 +76,18 @@ int give_size(Node * node){
 	else
 		return node->subtree_size[0] + node->subtree_size[1] + node->subtree_size[2];
 }
+void recalculate_subtree_sizes(Node * node){
+	// update the subtree sizes for all ancestors
+	while(node != NULL){
+		Node * par = node->parent;
+		for(int i=0;i<3;i++){
+			if(par->children[i] == node){
+				par->subtree_size[i] = give_size(node);
+			}
+		}
+		node = par;
+	}
+}
 void insert_internal(Node * node, ToBeInserted * ins){
 	if(node == NULL){
 		// create a new root node
@@ -103,6 +115,7 @@ void insert_internal(Node * node, ToBeInserted * ins){
 			node->subtree_size[2] = give_size(ins->right);
 		}
 		node->curr_size++;
+		recalculate_subtree_sizes(node);
 	}
 	else{
 		// find the position where this node to be inserted will actually be inserted
@@ -142,14 +155,18 @@ void insert_internal(Node * node, ToBeInserted * ins){
 		leftc->subtree_size[1] = node->subtree_size[1];
 		leftc->keys[0] = node->keys[0];
 
-		rightc->children[0] = node->children[2];
-		rightc->subtree_size[0] = node->subtree_size[2];
-		rightc->children[1] = node->children[3];
-		rightc->subtree_size[1] = node->subtree_size[3];
-		rightc->keys[0] = node->keys[2];
-
 		if(node->is_leaf){
+			rightc->keys[0] = node->keys[1]; // the middle key will also be part of the right child for leaf
+			rightc->keys[1] = node->keys[2];
+			rightc->subtree_size[0] = rightc->subtree_size[1] = 1;
 			leftc->next_node = rightc; // for the leaf nodes there should be pointer to the next b+tree node
+		}
+		else{
+			rightc->children[0] = node->children[2];
+			rightc->subtree_size[0] = node->subtree_size[2];
+			rightc->children[1] = node->children[3];
+			rightc->subtree_size[1] = node->subtree_size[3];
+			rightc->keys[0] = node->keys[2];
 		}
 		// prepare next "ToBeInserted" node for recursive call
 		ToBeInserted * next_ins = new ToBeInserted;
@@ -202,11 +219,14 @@ void insert(Node * node, int val){
 		}
 	}
 	else{
-		if(val == node->keys[0]){
-			node->subtree_size[0]++;
-		}
-		else if(val == node->keys[1]){
-			node->subtree_size[1]++;
+		if(val == node->keys[0] || val == node->keys[1]){
+			if(val == node->keys[0]){
+				node->subtree_size[0]++;
+			}
+			else if(val == node->keys[1]){
+				node->subtree_size[1]++;
+			}
+			recalculate_subtree_sizes(node);
 		}
 		else{
 			// split and call
