@@ -78,17 +78,23 @@ int give_size(Node * node){
 }
 void recalculate_subtree_sizes(Node * node){
 	// update the subtree sizes for all ancestors
-	while(node != NULL){
-		Node * par = node->parent;
-		for(int i=0;i<3;i++){
-			if(par->children[i] == node){
-				par->subtree_size[i] = give_size(node);
-			}
-		}
-		node = par;
+	if(node->is_leaf){
+		node->subtree_size[0] = 1;
+		if(node->curr_size == 2)
+			node->subtree_size[1] = 1;
+		return;
+	}
+	rep(i,0,2){
+		recalculate_subtree_sizes(node->children[i]);
+		node->subtree_size[i] = give_size(node->children[i]);
+	}
+	if(node->curr_size == 2){
+		recalculate_subtree_sizes(node->children[2]);
+		node->subtree_size[2] = give_size(node->children[2]);
 	}
 }
 void insert_internal(Node * node, ToBeInserted * ins){
+	cout<<"trying to insert "<<ins->val<<"\n";
 	if(node == NULL){
 		// create a new root node
 		cout<<"creating new root\n";
@@ -96,28 +102,39 @@ void insert_internal(Node * node, ToBeInserted * ins){
 		root->keys[0] = ins->val;
 		root->children[0] = ins->left;
 		root->children[1] = ins->right;
+		cout<<"left val "<<ins->left->keys[0]<<"\n";
+		cout<<"right val "<<ins->right->keys[0]<<"\n";
+		cout<<"right size "<<ins->right->curr_size<<"\n";
+		root->children[0]->parent = root;
+		root->children[1]->parent = root;
 		root->subtree_size[0] = give_size(ins->left);
 		root->subtree_size[1] = give_size(ins->right);
 		return;
 	}
+	cout<<"curr_size for node is "<<node->curr_size<<"\n";
+	cout<<"first key of node is "<<node->keys[0]<<"\n";
 	if(node->curr_size == 1){
 		cout<<"current node size is one(insert_internal)\n";
 		if(ins->val < node->keys[0]){
+			cout<<"insert at index 0\n";
 			node->children[2] = node->children[1];
 			node->subtree_size[2] = node->subtree_size[1];
 			node->children[1] = ins->right;
 			node->subtree_size[1] = give_size(ins->right);
 			node->children[0] = ins->left;
 			node->subtree_size[0] = give_size(ins->left);
+			node->keys[1] = node->keys[0];
+			node->keys[0] = ins->val;
 		}
 		else{
+			cout<<"insert at index 1\n";
 			node->children[1] = ins->left;
 			node->subtree_size[1] = give_size(ins->left);
 			node->children[2] = ins->right;
 			node->subtree_size[2] = give_size(ins->right);
+			node->keys[1] = ins->val;
 		}
 		node->curr_size++;
-		recalculate_subtree_sizes(node);
 	}
 	else{
 		// find the position where this node to be inserted will actually be inserted
@@ -167,6 +184,7 @@ void insert_internal(Node * node, ToBeInserted * ins){
 		leftc->keys[0] = node->keys[0];
 
 		if(node->is_leaf){
+			cout<<"The node split is leaf node\n";
 			leftc->is_leaf = true;
 			rightc->is_leaf = true;
 			rightc->keys[0] = node->keys[1]; // the middle key will also be part of the right child for leaf
@@ -181,6 +199,10 @@ void insert_internal(Node * node, ToBeInserted * ins){
 			rightc->children[1] = node->children[3];
 			rightc->subtree_size[1] = node->subtree_size[3];
 			rightc->keys[0] = node->keys[2];
+
+			// children 2 and 3 will get a new parent
+			node->children[2]->parent = rightc;
+			node->children[3]->parent = rightc;
 		}
 		leftc->parent = node->parent;
 		rightc->parent = node->parent;
@@ -251,7 +273,6 @@ void insert(Node * node, int val){
 			else if(val == node->keys[1]){
 				node->subtree_size[1]++;
 			}
-			recalculate_subtree_sizes(node);
 		}
 		else{
 			// split and call
@@ -259,6 +280,7 @@ void insert(Node * node, int val){
 			ToBeInserted * ins = new ToBeInserted;
 			ins->val = val;
 			ins->left = ins->right = NULL;
+			assert(node != NULL);
 			insert_internal(node, ins);
 		}
 	}
@@ -374,15 +396,16 @@ int main(){
 			max_key = max(max_key, x);
 			insert(root, x);
 			dfs(root, 0);
+			recalculate_subtree_sizes(root);
 		}
 		else if(tokens[0][0] == 'F'){
 			int x = stoi(tokens[1]);
-			// II res = find_val(root, x);
-			// if(res.F){
-			// 	cout<<"found\n";
-			// }
-			// else
-			// 	cout<<"not found\n";
+			II res = find_val(root, x);
+			if(res.F){
+				cout<<"found\n";
+			}
+			else
+				cout<<"not found\n";
 		}
 		else if(tokens[0][0] == 'C'){
 			int x = stoi(tokens[1]);
