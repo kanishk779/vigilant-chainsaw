@@ -24,8 +24,8 @@ typedef vector<LL> 		VL;
 
 void IO(){
 	#ifndef ONLINE_JUDGE
-    freopen("../input.txt", "r", stdin);
-    freopen("../output.txt", "w", stdout);
+    freopen("./input.txt", "r", stdin);
+    freopen("./output.txt", "w", stdout);
 	#endif
 	mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 	off;
@@ -35,7 +35,6 @@ void IO(){
 struct Node
 {
 	int keys[3];
-	int freq[3]; // matters only at leaf nodes
 	Node * children[4]; // child pointers
 	int is_leaf = true;
 	Node * next_node; // next node, matters only at leaf node.
@@ -64,7 +63,6 @@ Node * give_node(){
 	rep(i,0,3){
 		root->subtree_size[i] = 0;
 		root->children[i] = NULL;
-		root->freq[i] = 0;
 	}
 	root->parent = NULL;
 	return root;
@@ -168,7 +166,7 @@ void insert(Node * node, int val){
 	if(root == NULL){
 		root = give_node();
 		root->keys[0] = val;
-		root->freq[0] = 1;
+		root->subtree_size[0] = 1;
 		root->is_leaf = true;
 		return;
 	}
@@ -188,27 +186,27 @@ void insert(Node * node, int val){
 	}
 	if(node->curr_size == 1){
 		if(val == node->keys[0]){
-			node->freq[0]++;
+			node->subtree_size[0]++;
 		}
 		else{
 			if(val > node->keys[0]){
 				node->keys[1] = val;
-				node->freq[1] = 1;
+				node->subtree_size[1] = 1;
 			}
 			else{
 				swap(node->keys[0], node->keys[1]);
-				swap(node->freq[0], node->freq[1]);
+				swap(node->subtree_size[0], node->subtree_size[1]);
 				node->keys[0] = val;
-				node->freq[0] = 1;
+				node->subtree_size[0] = 1;
 			}
 		}
 	}
 	else{
 		if(val == node->keys[0]){
-			node->freq[0]++;
+			node->subtree_size[0]++;
 		}
 		else if(val == node->keys[1]){
-			node->freq[1]++;
+			node->subtree_size[1]++;
 		}
 		else{
 			// split and call
@@ -224,9 +222,9 @@ II find_val(Node * node, int val){
 	assert(node != NULL);
 	if (node->is_leaf == true){
 		if(node->keys[0] == val)
-			return MP(1, node->freq[0]);
+			return MP(1, node->subtree_size[0]);
 		else if(node->keys[1] == val)
-			return MP(1, node->freq[1]);
+			return MP(1, node->subtree_size[1]);
 		else
 			return MP(0, -1);
 	}
@@ -300,26 +298,37 @@ int range(Node * node, int x, int y, int l, int r){
 	ans += range(node->children[2], x, y, max(l, node->keys[1]), r);
 	return ans;
 } 
-LL min_key = 1e9;
-LL max_key = -1e9;
+int min_key = 1e9;
+int max_key = -1e9;
 int main(){
 	IO();
 	string s;
 	getline(cin, s);
 	while(!s.empty()){
+		cout<<s<<"\n";
 		istringstream iss(s);
 		vector<string> tokens{istream_iterator<string>{iss},istream_iterator<string>{}};
 		if(tokens[0][0] == 'I'){
-			
+			int x = stoi(tokens[1]);
+			min_key = min(min_key, x);
+			max_key = max(max_key, x);
+			insert(root, x);
 		}
 		else if(tokens[0][0] == 'F'){
-
+			int x = stoi(tokens[1]);
+			II res = find_val(root, x);
+			if(res.F){
+				cout<<"found\n";
+			}
+			else
+				cout<<"not found\n";
 		}
 		else if(tokens[0][0] == 'C'){
-
+			int x = stoi(tokens[1]);
 		}
 		else if(tokens[0][0] == 'R'){
-
+			int x = stoi(tokens[1]);
+			int y = stoi(tokens[2]);
 		}
 		else{
 			cout<<"Sorry We don't do that Here\n";
