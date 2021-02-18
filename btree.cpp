@@ -304,6 +304,27 @@ LL min_key = 1e9;
 LL max_key = -1e9;
 int main(){
 	IO();
-	// while()
+	string s;
+	getline(cin, s);
+	while(!s.empty()){
+		istringstream iss(s);
+		vector<string> tokens{istream_iterator<string>{iss},istream_iterator<string>{}};
+		if(tokens[0][0] == 'I'){
+			
+		}
+		else if(tokens[0][0] == 'F'){
+
+		}
+		else if(tokens[0][0] == 'C'){
+
+		}
+		else if(tokens[0][0] == 'R'){
+
+		}
+		else{
+			cout<<"Sorry We don't do that Here\n";
+		}
+		getline(cin, s);
+	}
 	return 0;
 }
