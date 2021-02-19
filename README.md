@@ -63,3 +63,16 @@ nodes.
 7. A new **ToBeInserted** Node is created with it's left and right pointers set
    to the newly created left and right Nodes. And it's val will be set to the
    number which is the 2nd key of the node being split.
+
+
+### Range
+This is a recursive function which gives the number of element in range [x, y]
+both inclusive.
+1. The initial range is the [min, max] where min is the minimum key inserted
+   till now and max is maximum key.
+2. If there is no overlap between the current range and given range [x, y] then
+   return 0.
+3. Else if the current range is completely inside the given range [x, y] then
+   return the number of keys in this range.
+4. Else call this function on children pointers.
+5. If a leaf is reached than check how many keys are within the given range.
