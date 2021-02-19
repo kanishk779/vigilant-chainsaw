@@ -22,9 +22,9 @@ typedef vector<LL> 		VL;
 //# define M_PI           3.14159265358979323846264338327950288
 // DSU
 
-void IO(){
+void IO(char* name){
 	#ifndef ONLINE_JUDGE
-    freopen("./input.txt", "r", stdin);
+    freopen(name, "r", stdin);
     freopen("./output.txt", "w", stdout);
 	#endif
 	mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
@@ -35,7 +35,7 @@ void IO(){
 struct Node
 {
 	int keys[3];
-	int freq[3];
+	int freq[3]; // stores the frequency of keys ( only useful at leaf nodes )
 	Node * children[4]; // child pointers
 	int is_leaf = true;
 	Node * next_node; // next node, matters only at leaf node.
@@ -436,8 +436,8 @@ int range(Node * node, int x, int y, int l, int r, int d=0){
 } 
 int min_key = 1e9;
 int max_key = -1e9;
-int main(){
-	IO();
+int main(int argc, char ** argv){
+	IO(argv[1]);
 	string s;
 	getline(cin, s);
 	while(!s.empty()){
@@ -460,10 +460,10 @@ int main(){
 			int x = stoi(tokens[1]);
 			II res = find_val(root, x);
 			if(res.F){
-				cout<<"f\n";
+				cout<<"YES\n";
 			}
 			else
-				cout<<"nf\n";
+				cout<<"NO\n";
 		}
 		else if(tokens[0][0] == 'C'){
 			int x = stoi(tokens[1]);

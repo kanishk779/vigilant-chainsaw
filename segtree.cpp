@@ -68,9 +68,9 @@ int main(){
 			int x = stoi(tokens[1]);
 			int res = query(0, N-1, x, x, 1);
 			if(res)
-				cout<<"f\n";
+				cout<<"YES\n";
 			else
-				cout<<"nf\n";
+				cout<<"NO\n";
 		}
 		else if(tokens[0][0] == 'C'){
 			int x = stoi(tokens[1]);
