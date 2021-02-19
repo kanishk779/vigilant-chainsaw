@@ -8,6 +8,28 @@ g++ -std=c++11 btree.cpp
 ```
 
 ## Explanation regarding algorithm
+### Structures
+```
+// 2 keys and 3 children
+struct Node
+{
+	int keys[3];
+	int freq[3]; // stores the frequency of keys ( only useful at leaf nodes )
+	Node * children[4]; // child pointers
+	int is_leaf = true;
+	Node * next_node; // next node, matters only at leaf node.
+	int subtree_size[4]; // stores number of keys associated with each of the child pointers
+	int curr_size; // how many keys are present in a node.
+	Node * parent; // parent of this Node, NULL for root
+};
+
+struct ToBeInserted
+{
+	int val;
+	Node * left;
+	Node * right;
+};
+```
 ### Insert
 This is the most challenging function to implement.
 1. Check if the root is NULL, if it is allocate a new root and insert the
@@ -22,3 +44,22 @@ This is the most challenging function to implement.
 6. This struct represents an element which is to be inserted in some node. It
    contains a left and right pointers of type Node and a number (Integer).
 
+
+### Insert Internal
+This is the recursive method for splitting nodes of type Node and inserting ToBeInserted
+nodes.
+1. If the node in which some number is to be inserted is NULL, that means we
+   need to create a new **root** node.
+2. If the number of keys in the node is 1, which means there is space for the
+   new number to be inserted. So we insert it at correct place in sorted order.
+3. Else we know that the current Node is full, hence we need to split. But
+   before that we will put the **ToBeInserted** node at the correct place in
+   sorted order.
+4. Children pointers and subtree_size values need to be shifted in some cases.
+5. After this we create two new Nodes, since we need to further split this node.
+6. If the node that is going to be split is a leaf node than the right Node
+   created in above step will have two keys, otherwise it will have only one
+   key. 
+7. A new **ToBeInserted** Node is created with it's left and right pointers set
+   to the newly created left and right Nodes. And it's val will be set to the
+   number which is the 2nd key of the node being split.
