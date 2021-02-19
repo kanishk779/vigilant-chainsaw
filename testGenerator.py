@@ -1,6 +1,6 @@
 import random
-lim = 30
-ops = 100
+lim = 50
+ops = 10000
 f = open('input.txt', 'w')
 for i in range(ops):
     j = random.randint(1, lim)
@@ -18,3 +18,5 @@ for i in range(ops):
     r = random.randint(1, lim)
     l = random.randint(1, r)
     f.write('RANGE '+str(l)+' '+str(r)+'\n')
+
+f.close()
