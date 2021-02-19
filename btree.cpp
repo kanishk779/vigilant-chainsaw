@@ -391,20 +391,31 @@ void dfs(Node * node, int d){
 		}
 	}
 }
+// subtree_size[0] -> stores the frequency of node->keys[0] in the leaf (because it does not have any subtree)
+// I could have created another variable for it so that it will be easy to understand.
 // [l, r] is covered by current node
-int range(Node * node, int x, int y, int l, int r){
+int range(Node * node, int x, int y, int l, int r, int d=0){
+	string s((size_t) 4*d, ' ');
 	if(x > r || y < l || l > r || node == NULL)
 		return 0;
-	cout<<l<<" "<<r<<"\n";
+	// cout<<s;
+	// cout<<l<<" "<<r<<"\n";
 	if(x <= l && r <= y)
 		return give_size(node);
-	LL ans = range(node->children[0], x, y, l, min(r, node->keys[0]-1));
+	LL ans = 0;
+	if(node->is_leaf){
+		rep(i,0,2)
+		if(node->keys[i] >= x && node->keys[i] <= y)
+			ans += node->subtree_size[i];
+		return ans;
+	}
+	ans += range(node->children[0], x, y, l, min(r, node->keys[0]-1), d+1);
 	if(node->curr_size == 1){
-		ans += range(node->children[1], x, y, max(l, node->keys[0]), r);
+		ans += range(node->children[1], x, y, max(l, node->keys[0]), r, d+1);
 	}
 	else{
-		ans += range(node->children[1], x, y, max(l, node->keys[0]), min(r, node->keys[1]-1));
-		ans += range(node->children[2], x, y, max(l, node->keys[1]), r);
+		ans += range(node->children[1], x, y, max(l, node->keys[0]), min(r, node->keys[1]-1), d+1);
+		ans += range(node->children[2], x, y, max(l, node->keys[1]), r, d+1);
 	}
 	return ans;
 } 
