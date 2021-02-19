@@ -389,25 +389,17 @@ int find_leq(Node * node, int val){
 void dfs(Node * node, int d){
 	string s((size_t) 4*d, ' ');
 	if(node != NULL){
-		// cout<<s;
-		// cout<<"sub[0] : "<<node->subtree_size[0]<<"\n";
 		cout<<s;
 		cout<<node->keys[0]<<"\n";
-		// cout<<s;
-		// cout<<"sub[1] : "<<node->subtree_size[1]<<"\n";
 		dfs(node->children[0], d+1);
 		dfs(node->children[1], d+1);
 		if(node->curr_size == 2){
 			cout<<s;
 			cout<<node->keys[1]<<"\n";
-			// cout<<s;
-			// cout<<"sub[2] : "<<node->subtree_size[2]<<"\n";
 			dfs(node->children[2], d+1);
 		}
 	}
 }
-// subtree_size[0] -> stores the frequency of node->keys[0] in the leaf (because it does not have any subtree)
-// I could have created another variable for it so that it will be easy to understand.
 // [l, r] is covered by current node
 int range(Node * node, int x, int y, int l, int r, int d=0){
 	string s((size_t) 4*d, ' ');
