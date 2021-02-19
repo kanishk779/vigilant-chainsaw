@@ -1,7 +1,7 @@
 import random
-lim = 20
-ops = 10
-f = open('input1.txt', 'w')
+lim = 30
+ops = 100
+f = open('input.txt', 'w')
 for i in range(ops):
     j = random.randint(1, lim)
     f.write('INSERT '+str(j) + '\n')

@@ -24,7 +24,7 @@ typedef vector<LL> 		VL;
 
 void IO(){
 	#ifndef ONLINE_JUDGE
-    freopen("./input1.txt", "r", stdin);
+    freopen("./input.txt", "r", stdin);
     freopen("./output.txt", "w", stdout);
 	#endif
 	mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
@@ -87,7 +87,7 @@ int give_size(Node * node){
 }
 void recalculate_subtree_sizes(Node * node){
 	// update the subtree sizes for all ancestors
-	cout<<"recalculate_subtree_sizes\n";
+	// cout<<"recalculate_subtree_sizes\n";
 	while(node->parent != NULL){
 		rep(i,0,3){
 			assert(node != NULL);
@@ -97,29 +97,29 @@ void recalculate_subtree_sizes(Node * node){
 	}
 }
 void insert_internal(Node * node, ToBeInserted * ins){
-	cout<<"trying to insert "<<ins->val<<"\n";
+	// cout<<"trying to insert "<<ins->val<<"\n";
 	if(node == NULL){
 		// create a new root node
-		cout<<"creating new root\n";
+		// cout<<"creating new root\n";
 		root = give_node();
 		root->keys[0] = ins->val;
 		root->children[0] = ins->left;
 		root->children[1] = ins->right;
-		cout<<"left val "<<ins->left->keys[0]<<"\n";
-		cout<<"right val "<<ins->right->keys[0]<<"\n";
-		cout<<"right size "<<ins->right->curr_size<<"\n";
+		// cout<<"left val "<<ins->left->keys[0]<<"\n";
+		// cout<<"right val "<<ins->right->keys[0]<<"\n";
+		// cout<<"right size "<<ins->right->curr_size<<"\n";
 		root->children[0]->parent = root;
 		root->children[1]->parent = root;
 		root->subtree_size[0] = give_size(ins->left);
 		root->subtree_size[1] = give_size(ins->right);
 		return;
 	}
-	cout<<"curr_size for node is "<<node->curr_size<<"\n";
-	cout<<"first key of node is "<<node->keys[0]<<"\n";
+	// cout<<"curr_size for node is "<<node->curr_size<<"\n";
+	// cout<<"first key of node is "<<node->keys[0]<<"\n";
 	if(node->curr_size == 1){
-		cout<<"current node size is one(insert_internal)\n";
+		// cout<<"current node size is one(insert_internal)\n";
 		if(ins->val < node->keys[0]){
-			cout<<"insert at index 0\n";
+			// cout<<"insert at index 0\n";
 			node->children[2] = node->children[1];
 			node->subtree_size[2] = node->subtree_size[1];
 			node->children[1] = ins->right;
@@ -130,7 +130,7 @@ void insert_internal(Node * node, ToBeInserted * ins){
 			node->keys[0] = ins->val;
 		}
 		else{
-			cout<<"insert at index 1\n";
+			// cout<<"insert at index 1\n";
 			node->children[1] = ins->left;
 			node->subtree_size[1] = give_size(ins->left);
 			node->children[2] = ins->right;
@@ -143,7 +143,7 @@ void insert_internal(Node * node, ToBeInserted * ins){
 		// find the position where this node to be inserted will actually be inserted
 		if(ins->val < node->keys[0]){
 			// insert at the start at index -> 0
-			cout<<"inserting at index 0\n";
+			// cout<<"inserting at index 0\n";
 			for(int i=2;i>=1;i--){
 				node->keys[i] = node->keys[i-1]; // shift the keys
 			}
@@ -165,7 +165,7 @@ void insert_internal(Node * node, ToBeInserted * ins){
 		}
 		else if(ins->val > node->keys[0] && ins->val < node->keys[1]){
 			// insert at index -> 1
-			cout<<"inserting at index 1\n";
+			// cout<<"inserting at index 1\n";
 			node->children[3] = node->children[2];
 			node->subtree_size[3] = node->subtree_size[2];
 			node->children[2] = ins->right;
@@ -173,7 +173,7 @@ void insert_internal(Node * node, ToBeInserted * ins){
 			node->children[1] = ins->left;
 			node->subtree_size[1] = give_size(ins->left);
 			
-			if(node->is_leaf){
+			if(node->is_leaf){  // update freq if the node is a leaf
 				node->freq[2] = node->freq[1];
 				node->freq[1] = 1;
 			}
@@ -182,51 +182,47 @@ void insert_internal(Node * node, ToBeInserted * ins){
 		}
 		else{
 			// insert at index -> 2
-			cout<<"inserting at index 2\n";
+			// cout<<"inserting at index 2\n";
 			node->children[3] = ins->right;
 			node->subtree_size[3] = give_size(ins->right);
 			node->children[2] = ins->left;
 			node->subtree_size[2] = give_size(ins->left);
 			node->keys[2] = ins->val;
+			if(node->is_leaf)
+				node->freq[2] = 1;
 		}
 		// create two new nodes (leftc and rightc)
 		Node * leftc = give_node();
 		Node * rightc = give_node();
-		leftc->children[0] = node->children[0];
-		leftc->children[1] = node->children[1];
+		rep(i,0,2){
+			leftc->children[i] = node->children[i];
+			leftc->subtree_size[i] = node->subtree_size[i];
+		}
 		leftc->keys[0] = node->keys[0];
 
 		if(node->is_leaf){
-			cout<<"The node split is leaf node\n";
-			leftc->subtree_size[0] = node->subtree_size[0];
-			leftc->subtree_size[1] = 0;
-			
+			// cout<<"The node split is leaf node\n";
 			leftc->is_leaf = true;
 			rightc->is_leaf = true;
-			rightc->keys[0] = node->keys[1]; // the middle key will also be part of the right child for leaf
-			rightc->keys[1] = node->keys[2];
+			leftc->freq[0] = node->freq[0];
+
+			rep(i,0,2){
+				rightc->keys[i] = node->keys[i+1]; // the middle key will also be part of the right child for leaf
+				rightc->freq[i] = node->freq[i+1];
+			}
 			rightc->curr_size = 2;
-			rightc->subtree_size[0] = max(1, node->subtree_size[1]);
-			rightc->subtree_size[1] = max(1, node->subtree_size[2]);
 			leftc->next_node = rightc; // for the leaf nodes there should be pointer to the next b+tree node
 			split_left = leftc;
 			split_right = rightc;
 		}
 		else{
-			leftc->subtree_size[0] = node->subtree_size[0];
-			leftc->subtree_size[1] = node->subtree_size[1];
-			
-			rightc->children[0] = node->children[2];
-			rightc->subtree_size[0] = node->subtree_size[2];
-			rightc->children[1] = node->children[3];
-			rightc->subtree_size[1] = node->subtree_size[3];
+			rep(i,0,2){
+				rightc->children[i] = node->children[i+2];
+				rightc->subtree_size[i] = node->subtree_size[i+2];
+			}
 			rightc->keys[0] = node->keys[2];
-
-			// children 2 and 3 will get a new parent
-			node->children[2]->parent = rightc;
-			node->children[3]->parent = rightc;
 		}
-		// adjust the parent pointers
+		// adjust the parent pointers (new parents will be alloted)
 		leftc->parent = node->parent;
 		rightc->parent = node->parent;
 		rep(i,0,4){
@@ -250,14 +246,14 @@ void insert_internal(Node * node, ToBeInserted * ins){
 }
 void insert(Node * node, int val){
 	if(root == NULL){
-		cout<<"root is NULL\n";
+		// cout<<"root is NULL\n";
 		root = give_node();
 		root->keys[0] = val;
 		root->freq[0] = 1;
 		root->is_leaf = true;
 		return;
 	}
-	cout<<"going to leaf\n";
+	// cout<<"going to leaf\n";
 	assert(node != NULL);
 	while(node->is_leaf == false){
 		if(val < node->keys[0])
@@ -274,44 +270,44 @@ void insert(Node * node, int val){
 		}
 		assert(node != NULL);
 	}
-	cout<<"reach leaf\n";
+	// cout<<"reach leaf\n";
 	if(node->curr_size == 1){
-		cout<<"leaf size is one\n";
+		// cout<<"leaf size is one\n";
 		if(val == node->keys[0]){
-			node->subtree_size[0]++;
+			node->freq[0]++;
 		}
 		else{
 			if(val > node->keys[0]){
 				node->keys[1] = val;
-				node->subtree_size[1] = 1;
+				node->freq[1] = 1;
 			}
 			else{
 				swap(node->keys[0], node->keys[1]);
-				swap(node->subtree_size[0], node->subtree_size[1]);
+				swap(node->freq[0], node->freq[1]);
 				node->keys[0] = val;
-				node->subtree_size[0] = 1;
+				node->freq[0] = 1;
 			}
 			node->curr_size++;
 		}
 		split_left = node;
 	}
 	else{
-		cout<<"leaf size is two\n";
+		// cout<<"leaf size is two\n";
 		if(val == node->keys[0] || val == node->keys[1]){
-			cout<<"duplicate entry\n";
+			// cout<<"duplicate entry\n";
 			if(val == node->keys[0]){
-				node->subtree_size[0]++;
-				cout<<"new size "<<node->subtree_size[0]<<"\n";
+				node->freq[0]++;
+				// cout<<"new size "<<node->freq[0]<<"\n";
 			}
 			else if(val == node->keys[1]){
-				node->subtree_size[1]++;
-				cout<<"new size "<<node->subtree_size[1]<<"\n";
+				node->freq[1]++;
+				// cout<<"new size "<<node->freq[1]<<"\n";
 			}
 			split_left = node;
 		}
 		else{
 			// split and call
-			cout<<"splitting and call\n";
+			// cout<<"splitting and call\n";
 			ToBeInserted * ins = new ToBeInserted;
 			ins->val = val;
 			ins->left = ins->right = NULL;
@@ -325,9 +321,9 @@ II find_val(Node * node, int val){
 	assert(node != NULL);
 	if (node->is_leaf == true){
 		if(node->keys[0] == val)
-			return MP(1, node->subtree_size[0]);
+			return MP(1, node->freq[0]);
 		else if(node->keys[1] == val)
-			return MP(1, node->subtree_size[1]);
+			return MP(1, node->freq[1]);
 		else
 			return MP(0, -1);
 	}
@@ -425,7 +421,7 @@ int range(Node * node, int x, int y, int l, int r, int d=0){
 	if(node->is_leaf){
 		rep(i,0,2)
 		if(node->keys[i] >= x && node->keys[i] <= y)
-			ans += node->subtree_size[i];
+			ans += node->freq[i];
 		return ans;
 	}
 	ans += range(node->children[0], x, y, l, min(r, node->keys[0]-1), d+1);
@@ -445,7 +441,7 @@ int main(){
 	string s;
 	getline(cin, s);
 	while(!s.empty()){
-		cout<<s<<"\n";
+		// cout<<s<<"\n";
 		istringstream iss(s);
 		vector<string> tokens{istream_iterator<string>{iss},istream_iterator<string>{}};
 		if(tokens[0][0] == 'I'){
@@ -458,7 +454,7 @@ int main(){
 				recalculate_subtree_sizes(split_left);
 			if(split_right != NULL)
 				recalculate_subtree_sizes(split_right);
-			dfs(root, 0);
+			// dfs(root, 0);
 		}
 		else if(tokens[0][0] == 'F'){
 			int x = stoi(tokens[1]);
