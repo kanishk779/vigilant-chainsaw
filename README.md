@@ -7,6 +7,19 @@ g++ -std=c++11 btree.cpp
 ./a.out input.txt
 ```
 
+## To Verify
+To verify that the code produces correct results, we can run the segtree.cpp.
+Running it will generate output1.txt, which can be later used by checker.py .
+```
+g++ -std=c++11 btree.cpp
+./a.out input.txt
+g++ -std=c++11 segtree.cpp
+./a.out
+python3 checker.py
+```
+If the output of checker.py is **Ok** that means the output produced by both segment
+tree and b+tree is **same**. Otherwise it will **raise an exception**.
+
 ## Explanation regarding algorithm
 ### Structures
 ```
