@@ -3,6 +3,7 @@ B+Tree
 
 ## How to execute this code
 ```
+python3 testGenerator.py
 g++ -std=c++11 btree.cpp
 ./a.out input.txt
 ```
