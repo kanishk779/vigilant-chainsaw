@@ -318,7 +318,9 @@ void insert(Node * node, int val){
 	return;
 }
 II find_val(Node * node, int val){
-	assert(node != NULL);
+	// assert(node != NULL);
+	if(node == NULL)
+		return MP(0, -1);
 	if (node->is_leaf == true){
 		if(node->keys[0] == val)
 			return MP(1, node->freq[0]);

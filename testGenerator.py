@@ -1,5 +1,5 @@
 import random
-lim = 50
+lim = 1000000000
 ops = 10000
 f = open('input.txt', 'w')
 for i in range(ops):

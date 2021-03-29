@@ -24,7 +24,7 @@ typedef vector<LL> 		VL;
 
 void IO(){
 	#ifndef ONLINE_JUDGE
-    freopen("./input.txt", "r", stdin);
+    freopen("./inp3.txt", "r", stdin);
     freopen("./output1.txt", "w", stdout);
 	#endif
 	mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());

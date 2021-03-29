@@ -18,8 +18,11 @@ g++ -std=c++11 segtree.cpp
 ./a.out
 python3 checker.py
 ```
-If the output of checker.py is **Ok** that means the output produced by both segment
-tree and b+tree is **same**. Otherwise it will **raise an exception**.
+The output of checker.py tells the number of total queries and how many lines
+are not matching with segtree output.
+NOTE : the numbers inserted in btree and segtree must be in **range [1, 1e6]**
+otherwise segtree's output is wrong but that of btree's output is correct, and
+we should not compare with segtree.
 
 ## Explanation regarding algorithm
 ### Structures
