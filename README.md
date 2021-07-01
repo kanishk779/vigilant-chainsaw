@@ -1,5 +1,8 @@
 # vigilant-chainsaw
 B+Tree
+This was a project done as part of Data-Systems (Advanced DBMS) course in 6th
+Semester. The objective was to learn how the index structures help in answering 
+range queries in database system by implementing a B+Tree. 
 
 ## How to execute this code
 ```
